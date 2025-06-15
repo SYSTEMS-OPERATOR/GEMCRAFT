@@ -1,2 +1,17 @@
 # GEMCRAFT
+
 Gemma Optimizer
+----------------
+
+This project provides tools to modify Google DeepMind's Gemma models.
+The optimizer removes nonlinear layers (the **STRIPPER** step) and wraps
+feed‑forward blocks with a "seamless" toroidal transformation. The
+seamless wrapper now pads non-square sequence lengths so the wrapping is
+always applied.
+
+To process the 1B model run:
+
+```bash
+python NOTEBOOK/seamless_gemma.py --model_name google/gemma-3-1b-pt \
+    --save_path ./SEAMLESS-GEMMA-1B-RAW
+```
