@@ -70,16 +70,26 @@ class SeamlessWrapper(nn.Module):
             return self.module(x)
 
         batch_size, seq_len, hidden_dim = x.shape
-        sqrt_val = math.isqrt(seq_len)
-        if sqrt_val * sqrt_val != seq_len:
-            logger.warning(f"seq_len ({seq_len}) is not a perfect square; seamless wrapping skipped.")
-            return self.module(x)
+        side = math.isqrt(seq_len)
+        pad_len = 0
+        if side * side != seq_len:
+            # Pad the module output to the next perfect square so wrapping can proceed
+            side += 1
+            pad_len = side * side - seq_len
+            logger.debug(
+                f"seq_len ({seq_len}) not square; padding output with {pad_len} zeros to {side**2}"
+            )
+        else:
+            logger.debug("seq_len is already a perfect square")
 
         try:
             x_processed = self.module(x)
-            x_reshaped = x_processed.view(batch_size, sqrt_val, sqrt_val, hidden_dim)
+            if pad_len:
+                pad = torch.zeros(batch_size, pad_len, hidden_dim, device=x.device, dtype=x.dtype)
+                x_processed = torch.cat([x_processed, pad], dim=1)
+            x_reshaped = x_processed.view(batch_size, side, side, hidden_dim)
             x_wrapped = wrap_tensor(x_reshaped)
-            new_seq_len = (sqrt_val + 2) ** 2
+            new_seq_len = (side + 2) ** 2
             x_final = x_wrapped.view(batch_size, new_seq_len, hidden_dim)
             logger.info("Seamless wrapping applied successfully.")
             return x_final
