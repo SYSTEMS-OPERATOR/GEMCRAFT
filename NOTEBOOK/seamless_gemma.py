@@ -66,15 +66,21 @@ class SeamlessWrapper(nn.Module):
         batch_size, seq_len, hidden_dim = x.shape
         sqrt_val = math.isqrt(seq_len)
         if sqrt_val * sqrt_val != seq_len:
-            log(f"Warning: seq_len ({seq_len}) not perfect square; seamless wrapping skipped.")
-            return self.module(x)
+            sqrt_val += 1
+            pad_len = sqrt_val * sqrt_val - seq_len
+        else:
+            pad_len = 0
 
         try:
             x_processed = self.module(x)
+            if pad_len:
+                pad_slice = x_processed[:, -1:, :].expand(batch_size, pad_len, hidden_dim)
+                x_processed = torch.cat([x_processed, pad_slice], dim=1)
             x_reshaped = x_processed.view(batch_size, sqrt_val, sqrt_val, hidden_dim)
             x_wrapped = wrap_tensor(x_reshaped)
             new_seq_len = (sqrt_val + 2) ** 2
             x_final = x_wrapped.view(batch_size, new_seq_len, hidden_dim)
+            x_final = x_final[:, :seq_len, :]
             log("Seamless wrapping applied successfully.")
             return x_final
         except Exception as e:
@@ -84,10 +90,14 @@ class SeamlessWrapper(nn.Module):
 # Wrap Feed-Forward Modules
 wrap_counter = 0
 
+def _is_feedforward_block(mod: nn.Module) -> bool:
+    linear_layers = [m for m in mod.modules() if isinstance(m, nn.Linear)]
+    return len(linear_layers) >= 2
+
 def wrap_feedforward_modules(module, report_changes=True):
     global wrap_counter
     for name, child in list(module.named_children()):
-        if 'mlp' in name.lower() or 'ffn' in name.lower():
+        if _is_feedforward_block(child) or 'mlp' in name.lower() or 'ffn' in name.lower():
             wrapped_child = SeamlessWrapper(child)
             setattr(module, name, wrapped_child)
             wrap_counter += 1
