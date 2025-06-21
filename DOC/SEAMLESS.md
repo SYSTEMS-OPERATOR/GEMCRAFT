@@ -1,3 +1,5 @@
+# Seamless Notebook Guide 🎛️
+
 Below is an example of a complete notebook (suitable for both Google Colab and Kaggle). It will:
 
 - Load the Gemma 3 1B model from Hugging Face.
