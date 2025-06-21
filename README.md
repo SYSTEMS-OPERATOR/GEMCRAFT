@@ -1,6 +1,6 @@
 # GEMCRAFT
 
-Gemma Optimizer
+Gemma Optimizer ✨
 ----------------
 
 This project provides tools to modify Google DeepMind's Gemma models.
@@ -9,9 +9,11 @@ feed‑forward blocks with a "seamless" toroidal transformation. The
 seamless wrapper now pads non-square sequence lengths so the wrapping is
 always applied.
 
+Install the required dependencies with `pip install torch transformers`.
+
 To process the 1B model run:
 
 ```bash
-python NOTEBOOK/seamless_gemma.py --model_name google/gemma-3-1b-pt \
+python NOTEBOOK/seamless-gemma.py --model_name google/gemma-3-1b-pt \
     --save_path ./SEAMLESS-GEMMA-1B-RAW
 ```

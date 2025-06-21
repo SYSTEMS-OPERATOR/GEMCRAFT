@@ -1,3 +1,5 @@
+# STRIPPER Notebook Guide 🧰
+
 Below is an example of a complete “STRIPPER Notebook” that you can run either in Google Colab or Kaggle. This notebook loads a Gemma 3 model, recursively replaces selected nonlinear functions with linear alternatives (using Identity modules as stand‐ins), reports which modules were replaced, and saves a new version of the model. You can then run a quick inference test to verify the changes.
 
 ---
