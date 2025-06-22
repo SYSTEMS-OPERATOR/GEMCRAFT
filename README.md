@@ -17,3 +17,9 @@ To process the 1B model run:
 python NOTEBOOK/seamless-gemma.py --model_name google/gemma-3-1b-pt \
     --save_path ./SEAMLESS-GEMMA-1B-RAW
 ```
+
+The script now accepts extra options:
+
+- `--device` selects the torch device (e.g. `cuda`).
+- `--skip_stripper` skips nonlinear layer removal.
+- `--skip_seamless` skips the seamless wrapping step.
