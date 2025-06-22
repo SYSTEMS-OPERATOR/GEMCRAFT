@@ -16,12 +16,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def load_model(model_name: str):
+def load_model(model_name: str, device: torch.device):
     try:
         logger.info(f"Loading model '{model_name}'...")
         model = AutoModelForCausalLM.from_pretrained(model_name)
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         logger.info("Model and tokenizer loaded successfully.")
+        model.to(device)
+        logger.info(f"Model moved to {device}.")
         return model, tokenizer
     except Exception as e:
         logger.error(f"Error loading model: {e}")
@@ -122,8 +124,9 @@ def save_model(model: nn.Module, tokenizer, save_path: str) -> None:
 
 
 def main(args):
+    device = torch.device(args.device)
     # Load model and tokenizer
-    model, tokenizer = load_model(args.model_name)
+    model, tokenizer = load_model(args.model_name, device)
 
     # Inspect model structure and count parameters
     inspect_model(model)
@@ -132,14 +135,24 @@ def main(args):
     counters = {"nonlinear_replacements": 0, "ffn_wrapped": 0}
 
     # Replace nonlinear modules (STRIPPER process)
-    logger.info("Starting STRIPPER process...")
-    replace_nonlinear(model, counters)
-    logger.info(f"STRIPPER process complete. Total replacements made: {counters['nonlinear_replacements']}")
+    if args.skip_stripper:
+        logger.info("Skipping STRIPPER step as requested.")
+    else:
+        logger.info("Starting STRIPPER process...")
+        replace_nonlinear(model, counters)
+        logger.info(
+            f"STRIPPER process complete. Total replacements made: {counters['nonlinear_replacements']}"
+        )
 
     # Wrap feed-forward modules with SeamlessWrapper
-    logger.info("Wrapping feed-forward modules with SeamlessWrapper...")
-    wrap_feedforward_modules(model, counters)
-    logger.info(f"Feed-forward wrapping complete. Total modules wrapped: {counters['ffn_wrapped']}")
+    if args.skip_seamless:
+        logger.info("Skipping seamless wrapping step as requested.")
+    else:
+        logger.info("Wrapping feed-forward modules with SeamlessWrapper...")
+        wrap_feedforward_modules(model, counters)
+        logger.info(
+            f"Feed-forward wrapping complete. Total modules wrapped: {counters['ffn_wrapped']}"
+        )
 
     # Save the modified model
     save_model(model, tokenizer, args.save_path)
@@ -153,9 +166,33 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Seamless Gemma 3 1B STRIPPER Notebook")
-    parser.add_argument("--model_name", type=str, default="google/gemma-3-1b-pt",
-                        help="The Hugging Face model identifier (default: google/gemma-3-1b-pt)")
-    parser.add_argument("--save_path", type=str, default="./SEAMLESS-GEMMA-1B-RAW",
-                        help="The directory path to save the modified model")
+    parser.add_argument(
+        "--model_name",
+        type=str,
+        default="google/gemma-3-1b-pt",
+        help="The Hugging Face model identifier (default: google/gemma-3-1b-pt)",
+    )
+    parser.add_argument(
+        "--save_path",
+        type=str,
+        default="./SEAMLESS-GEMMA-1B-RAW",
+        help="The directory path to save the modified model",
+    )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="cpu",
+        help="Torch device for inference (cpu or cuda).",
+    )
+    parser.add_argument(
+        "--skip_stripper",
+        action="store_true",
+        help="Skip removing nonlinear modules.",
+    )
+    parser.add_argument(
+        "--skip_seamless",
+        action="store_true",
+        help="Skip wrapping feed-forward modules with the seamless wrapper.",
+    )
     args = parser.parse_args()
     main(args)
