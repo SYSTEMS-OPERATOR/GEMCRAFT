@@ -23,3 +23,10 @@ The script now accepts extra options:
 - `--device` selects the torch device (e.g. `cuda`).
 - `--skip_stripper` skips nonlinear layer removal.
 - `--skip_seamless` skips the seamless wrapping step.
+
+After generating the modified checkpoint you can test inference with:
+
+```bash
+python inference.py --model_path ./SEAMLESS-GEMMA-1B-RAW \
+    --prompt "Calculate 8 divided by 2."
+```
