@@ -81,6 +81,11 @@ class SeamlessWrapper(nn.Module):
 
         try:
             x_processed = self.module(x)
+        except Exception as e:
+            logger.error(f"Error executing wrapped module: {e}. Returning input.")
+            return x
+
+        try:
             if pad_len:
                 pad_slice = x_processed[:, -1:, :].expand(batch_size, pad_len, hidden_dim)
                 x_processed = torch.cat([x_processed, pad_slice], dim=1)
@@ -92,7 +97,9 @@ class SeamlessWrapper(nn.Module):
             logger.info("Seamless wrapping applied successfully.")
             return x_final
         except Exception as e:
-            logger.error(f"Error during seamless wrapping: {e}. Returning original output.")
+            logger.error(
+                f"Error during seamless wrapping: {e}. Returning original output."
+            )
             return x_processed
 
 
