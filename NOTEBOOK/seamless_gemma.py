@@ -77,6 +77,22 @@ class SeamlessWrapper(nn.Module):
         try:
             x_processed = self.module(x)
         except Exception as e:
+            log(f"Error executing wrapped module: {e}. Returning input.")
+            return x
+
+        try:
+            if pad_len:
+                pad_slice = x_processed[:, -1:, :].expand(batch_size, pad_len, hidden_dim)
+                x_processed = torch.cat([x_processed, pad_slice], dim=1)
+            x_reshaped = x_processed.view(batch_size, sqrt_val, sqrt_val, hidden_dim)
+            x_wrapped = wrap_tensor(x_reshaped)
+            new_seq_len = (sqrt_val + 2) ** 2
+            x_final = x_wrapped.view(batch_size, new_seq_len, hidden_dim)
+            x_final = x_final[:, :seq_len, :]
+            log("Seamless wrapping applied successfully.")
+            return x_final
+
+        except Exception as e:
             log(f"Error during seamless wrapping: {e}. Returning original input.")
             return x
 
