@@ -92,7 +92,9 @@ class SeamlessWrapper(nn.Module):
             logger.info("Seamless wrapping applied successfully.")
             return x_final
         except Exception as e:
-            logger.error(f"Error during seamless wrapping: {e}. Returning original output.")
+            logger.error(
+                f"Error during seamless wrapping: {e}. Returning original output."
+            )
             return x_processed
 
 
