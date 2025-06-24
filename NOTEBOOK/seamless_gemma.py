@@ -8,7 +8,9 @@ def log(message):
     print(f"[LOG]: {message}")
 
 # Load and Inspect the Model
-model_name = "google/deepmind-gemma-3-1b"
+# The original path referenced a gated model which fails without authentication.
+# Use the open access Gemma checkpoint instead so the script works by default.
+model_name = "google/gemma-3-1b-pt"
 try:
     log(f"Loading model {model_name}...")
     model = AutoModelForCausalLM.from_pretrained(model_name)
