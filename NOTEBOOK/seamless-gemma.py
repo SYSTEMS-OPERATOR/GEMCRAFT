@@ -79,13 +79,7 @@ class SeamlessWrapper(nn.Module):
         else:
             pad_len = 0
 
-        x_processed = None
-        try:
-            x_processed = self.module(x)
-        except Exception as e:
-            logger.error(f"Error executing wrapped module: {e}. Returning input.")
-            return x
-
+        x_processed = self.module(x)
         try:
             if pad_len:
                 pad_slice = x_processed[:, -1:, :].expand(batch_size, pad_len, hidden_dim)
