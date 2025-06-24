@@ -79,6 +79,7 @@ class SeamlessWrapper(nn.Module):
         else:
             pad_len = 0
 
+        x_processed = None
         try:
             x_processed = self.module(x)
         except Exception as e:
