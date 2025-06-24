@@ -79,8 +79,8 @@ class SeamlessWrapper(nn.Module):
         else:
             pad_len = 0
 
+        x_processed = self.module(x)
         try:
-            x_processed = self.module(x)
             if pad_len:
                 pad_slice = x_processed[:, -1:, :].expand(batch_size, pad_len, hidden_dim)
                 x_processed = torch.cat([x_processed, pad_slice], dim=1)
