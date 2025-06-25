@@ -44,7 +44,7 @@ def log(message):
 # We'll load Gemma 3 1B and do a quick inspection. (Adjust the model ID if needed.)
 
 # %% [code]
-model_name = "google/deepmind-gemma-3-1b"  # Replace with the actual Hugging Face model ID
+model_name = "google/gemma-3-1b-pt"  # Default 1B pretrained checkpoint
 try:
     log(f"Loading model {model_name} ...")
     model = AutoModelForCausalLM.from_pretrained(model_name)
