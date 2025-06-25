@@ -24,7 +24,7 @@ import torch.nn as nn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Replace this with the actual model ID if different
-model_name = "google/deepmind-gemma-3-27b"  # Hypothetical model ID
+model_name = "google/gemma-3-27b-it"  # Default 27B instruction-tuned checkpoint
 print(f"Loading model {model_name}...")
 
 # Load the Gemma 3 model and tokenizer
