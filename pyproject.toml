@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gemcraft"
+version = "0.1.0"
+description = "Gemma optimizer tools"
+readme = "README.md"
+authors = [{name = "GEMCRAFT Team"}]
+requires-python = ">=3.8"
+dependencies = ["torch", "transformers"]
+
+[project.scripts]
+gemcraft-inference = "inference:main"
+gemcraft-seamless = "gemcraft.seamless:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gemcraft*"]
+exclude = ["DATAFORGE*", "DOC*", "NOTEBOOK*"]
