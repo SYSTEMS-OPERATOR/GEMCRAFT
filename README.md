@@ -11,10 +11,14 @@ always applied.
 
 Install the required dependencies with `pip install -r requirements.txt`.
 
+This will provide two console commands: `gemcraft-inference` and
+`gemcraft-seamless` for running inference and model modification
+respectively.
+
 To process the 1B model run:
 
 ```bash
-python NOTEBOOK/seamless-gemma.py --model_name google/gemma-3-1b-pt \
+gemcraft-seamless --model_name google/gemma-3-1b-pt \
     --save_path ./SEAMLESS-GEMMA-1B-RAW
 ```
 
@@ -27,6 +31,6 @@ The script now accepts extra options:
 After generating the modified checkpoint you can test inference with:
 
 ```bash
-python inference.py --model_path ./SEAMLESS-GEMMA-1B-RAW \
+gemcraft-inference --model_path ./SEAMLESS-GEMMA-1B-RAW \
     --prompt "Calculate 8 divided by 2."
 ```
