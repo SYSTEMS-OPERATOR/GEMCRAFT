@@ -9,7 +9,7 @@ feed‑forward blocks with a "seamless" toroidal transformation. The
 seamless wrapper now pads non-square sequence lengths so the wrapping is
 always applied.
 
-Install the required dependencies with `pip install torch transformers`.
+Install the required dependencies with `pip install -r requirements.txt`.
 
 To process the 1B model run:
 
