@@ -9,11 +9,7 @@ feed‑forward blocks with a "seamless" toroidal transformation. The
 seamless wrapper now pads non-square sequence lengths so the wrapping is
 always applied.
 
-Install the package (which includes the required dependencies) with:
-
-```bash
-pip install -e .
-```
+Install the required dependencies with `pip install -r requirements.txt`.
 
 This will provide two console commands: `gemcraft-inference` and
 `gemcraft-seamless` for running inference and model modification
