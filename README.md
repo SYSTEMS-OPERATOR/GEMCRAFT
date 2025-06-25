@@ -30,3 +30,10 @@ After generating the modified checkpoint you can test inference with:
 python inference.py --model_path ./SEAMLESS-GEMMA-1B-RAW \
     --prompt "Calculate 8 divided by 2."
 ```
+
+To verify your Python environment you can precompile the scripts:
+
+```bash
+python -m compileall NOTEBOOK/seamless-gemma.py inference.py
+```
+
