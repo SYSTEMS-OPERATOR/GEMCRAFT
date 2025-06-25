@@ -41,3 +41,5 @@ To verify your Python environment you can precompile the scripts:
 python -m compileall NOTEBOOK/seamless-gemma.py inference.py
 ```
 
+
+For a walkthrough of how the scripts interact, see [DOC/PROGRAM_FLOW.md](DOC/PROGRAM_FLOW.md).
