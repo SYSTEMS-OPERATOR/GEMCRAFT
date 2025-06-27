@@ -102,17 +102,25 @@ def _is_feedforward_block(mod: nn.Module) -> bool:
     linear_layers = [m for m in mod.modules() if isinstance(m, nn.Linear)]
     return len(linear_layers) >= 2
 
-def wrap_feedforward_modules(module: nn.Module, counters: Dict[str, int], report_changes: bool = True) -> None:
-    """Recursively wraps feed-forward modules with SeamlessWrapper."""
+def wrap_feedforward_modules(
+    module: nn.Module, counters: Dict[str, int], report_changes: bool = True
+) -> nn.Module:
+    """Recursively wrap feed-forward blocks with :class:`SeamlessWrapper`."""
+
+    # If the module itself looks like a feed-forward block, wrap and return it.
+    if _is_feedforward_block(module):
+        counters["ffn_wrapped"] += 1
+        if report_changes:
+            logger.info("Wrapping feed-forward block with SeamlessWrapper.")
+        return SeamlessWrapper(module)
+
+    # Otherwise process its children in-place
     for name, child in list(module.named_children()):
-        if _is_feedforward_block(child) or 'mlp' in name.lower() or 'ffn' in name.lower():
-            wrapped_child = SeamlessWrapper(child)
-            setattr(module, name, wrapped_child)
-            counters["ffn_wrapped"] += 1
-            if report_changes:
-                logger.info(f"Wrapped '{name}' with SeamlessWrapper.")
-        else:
-            wrap_feedforward_modules(child, counters, report_changes=report_changes)
+        wrapped = wrap_feedforward_modules(child, counters, report_changes)
+        if wrapped is not child:
+            setattr(module, name, wrapped)
+
+    return module
 
 
 def save_model(model: nn.Module, tokenizer, save_path: str) -> None:
@@ -151,7 +159,7 @@ def main(args):
         logger.info("Skipping seamless wrapping step as requested.")
     else:
         logger.info("Wrapping feed-forward modules with SeamlessWrapper...")
-        wrap_feedforward_modules(model, counters)
+        model = wrap_feedforward_modules(model, counters)
         logger.info(
             f"Feed-forward wrapping complete. Total modules wrapped: {counters['ffn_wrapped']}"
         )

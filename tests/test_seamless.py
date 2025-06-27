@@ -2,7 +2,13 @@ import torch
 import torch.nn as nn
 import types
 
-from gemcraft.seamless import wrap_tensor, _is_feedforward_block, SeamlessWrapper, replace_nonlinear
+from gemcraft.seamless import (
+    wrap_tensor,
+    _is_feedforward_block,
+    SeamlessWrapper,
+    replace_nonlinear,
+    wrap_feedforward_modules,
+)
 
 # Dummy modules to simulate nonlinear layers
 class GeGLU(nn.Module):
@@ -53,3 +59,12 @@ def test_seamless_wrapper_shape():
     x = torch.ones(1,3,2)
     out = wrapper(x)
     assert out.shape == x.shape
+
+
+def test_wrap_feedforward_modules_top_level():
+    """Ensure top-level feed-forward blocks are wrapped."""
+    model = nn.Sequential(nn.Linear(2, 2), nn.ReLU(), nn.Linear(2, 2))
+    counters = {"ffn_wrapped": 0}
+    wrapped = wrap_feedforward_modules(model, counters, report_changes=False)
+    assert isinstance(wrapped, SeamlessWrapper)
+    assert counters["ffn_wrapped"] == 1
