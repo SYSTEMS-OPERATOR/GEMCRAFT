@@ -19,3 +19,6 @@ gemcraft-seamless = "gemcraft.seamless:main"
 where = ["."]
 include = ["gemcraft*"]
 exclude = ["DATAFORGE*", "DOC*", "NOTEBOOK*"]
+
+[tool.setuptools]
+py-modules = ["inference"]
