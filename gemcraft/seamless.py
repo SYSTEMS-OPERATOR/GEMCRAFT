@@ -42,8 +42,8 @@ def inspect_model(model: nn.Module) -> None:
 def replace_nonlinear(module: nn.Module, counters: Dict[str, int], report_changes: bool = True) -> None:
     """Recursively replaces selected nonlinear modules with nn.Identity."""
     for name, child in module.named_children():
-        child_class = child.__class__.__name__
-        if child_class in {"GeGLU", "RMSNorm", "QKNorm"}:
+        child_class = child.__class__.__name__.lower()
+        if child_class in {"geglu", "rmsnorm", "qknorm"}:
             setattr(module, name, nn.Identity())
             counters["nonlinear_replacements"] += 1
             if report_changes:

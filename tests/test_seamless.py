@@ -9,6 +9,11 @@ class GeGLU(nn.Module):
     def forward(self, x):
         return x
 
+# Uppercase variant to ensure case-insensitive replacement
+class GEGLU(nn.Module):
+    def forward(self, x):
+        return x
+
 class RMSNorm(nn.Module):
     def forward(self, x):
         return x
@@ -39,12 +44,14 @@ def test_replace_nonlinear():
         def __init__(self):
             super().__init__()
             self.a = GeGLU()
-            self.b = nn.Linear(1,1)
+            self.b = GEGLU()  # uppercase variant
+            self.c = nn.Linear(1,1)
     mod = TestModule()
     counters = {"nonlinear_replacements":0}
     replace_nonlinear(mod, counters, report_changes=False)
     assert isinstance(mod.a, nn.Identity)
-    assert counters["nonlinear_replacements"] == 1
+    assert isinstance(mod.b, nn.Identity)
+    assert counters["nonlinear_replacements"] == 2
 
 
 def test_seamless_wrapper_shape():
