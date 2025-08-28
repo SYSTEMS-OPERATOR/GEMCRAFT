@@ -133,7 +133,7 @@ def save_model(model: nn.Module, tokenizer, save_path: str) -> None:
         raise
 
 
-def main(args):
+def run(args):
     device = torch.device(args.device)
     # Load model and tokenizer
     model, tokenizer = load_model(args.model_name, device)
@@ -175,6 +175,11 @@ def main(args):
 
 
 if __name__ == "__main__":
+    main()
+
+
+def main(argv=None):
+    """Entry point for the console script."""
     parser = argparse.ArgumentParser(description="Seamless Gemma 3 1B STRIPPER Notebook")
     parser.add_argument(
         "--model_name",
@@ -204,5 +209,9 @@ if __name__ == "__main__":
         action="store_true",
         help="Skip wrapping feed-forward modules with the seamless wrapper.",
     )
-    args = parser.parse_args()
-    main(args)
+    args = parser.parse_args(argv)
+    run(args)
+
+
+if __name__ == "__main__":
+    main()
